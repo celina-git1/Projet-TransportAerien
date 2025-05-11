@@ -24,16 +24,31 @@ def parse_time(t):
         return pd.NaT
 
 # Appliquer la conversion aux colonnes horaires
-df["heure_depart_prevue_dt"] = df["heure_depart_prevue"].apply(parse_time)
-df["heure_depart_reelle_dt"] = df["heure_depart_reelle"].apply(parse_time)
-df["heure_arrivee_prevue_dt"] = df["heure_arrivee_prevue"].apply(parse_time)
-df["heure_arrivee_reelle_dt"] = df["heure_arrivee_reelle"].apply(parse_time)
+# Convertir la colonne date (si ce n’est pas déjà fait)
+df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+# Combiner la date et l'heure pour recréer un datetime complet
+def combine_date_time(date, heure):
+    try:
+        return pd.to_datetime(f"{date.date()} {heure}", format="%Y-%m-%d %H:%M")
+    except:
+        return pd.NaT
+
+df["heure_depart_prevue_dt"] = df.apply(lambda row: combine_date_time(row["date"], row["heure_depart_prevue"]), axis=1)
+df["heure_depart_reelle_dt"] = df.apply(lambda row: combine_date_time(row["date"], row["heure_depart_reelle"]), axis=1)
+df["heure_arrivee_prevue_dt"] = df.apply(lambda row: combine_date_time(row["date"], row["heure_arrivee_prevue"]), axis=1)
+df["heure_arrivee_reelle_dt"] = df.apply(lambda row: combine_date_time(row["date"], row["heure_arrivee_reelle"]), axis=1)
+
 
 # Supprimer les valeurs aberrantes : retards > 10 heures
 df = df[(df["retard_depart_min"].abs() <= 600) & (df["retard_arrivee_min"].abs() <= 600)]
 
 # Réinitialiser l'index
 df.reset_index(drop=True, inplace=True)
+
+print(df[["heure_depart_reelle", "heure_depart_reelle_dt"]].head())
+print(df["heure_depart_reelle_dt"].min(), df["heure_depart_reelle_dt"].max())
+
 
 # Sauvegarder dans un nouveau fichier
 df.to_csv("vols_orly_nettoyage.csv", index=False, encoding="utf-8")
