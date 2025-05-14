@@ -7,6 +7,17 @@ df = pd.read_csv("vols_orly_details.csv")
 print("Données chargées :")
 print(df.info())
 
+# Remplacer les terminaux incorrects (A à F) ou manquants par "Inconnu"
+terminaux_valides = ["1", "2", "3", "4"]
+
+df["terminal_depart"] = df["terminal_depart"].apply(
+    lambda x: x if pd.notna(x) and str(x).strip() in terminaux_valides else "Inconnu"
+)
+
+df["terminal_arrivee"] = df["terminal_arrivee"].apply(
+    lambda x: x if pd.notna(x) and str(x).strip() in terminaux_valides else "Inconnu"
+)
+
 # Remplacer les "--" par des NaN
 df.replace("--", pd.NA, inplace=True)
 
