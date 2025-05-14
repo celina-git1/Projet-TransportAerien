@@ -1,8 +1,9 @@
 import pandas as pd
 from datetime import datetime
+import re
 
 # Chargement du CSV
-df = pd.read_csv("vols_orly2.csv")
+df = pd.read_csv("vols_orly_details.csv")
 print("Données chargées :")
 print(df.info())
 
@@ -43,12 +44,17 @@ df["heure_arrivee_reelle_dt"] = df.apply(lambda row: combine_date_time(row["date
 # Supprimer les valeurs aberrantes : retards > 10 heures
 df = df[(df["retard_depart_min"].abs() <= 600) & (df["retard_arrivee_min"].abs() <= 600)]
 
+# Régularisation des noms de compagnie
+df["compagnie"] = df["compagnie"].str.strip()
+df["compagnie"] = df["compagnie"].apply(lambda x: re.sub(r"\s+\d+$", "", x))
+
 # Réinitialiser l'index
 df.reset_index(drop=True, inplace=True)
 
 print(df[["heure_depart_reelle", "heure_depart_reelle_dt"]].head())
 print(df["heure_depart_reelle_dt"].min(), df["heure_depart_reelle_dt"].max())
 
+pd.set_option('display.max_columns', None)
 
 # Sauvegarder dans un nouveau fichier
 df.to_csv("vols_orly_nettoyage.csv", index=False, encoding="utf-8")
