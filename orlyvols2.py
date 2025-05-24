@@ -81,7 +81,7 @@ def get_vol_details(url):
 
 # Scrape tous les vols pour une date donnée
 def get_flights(date_str, timestamp):
-    url = f"https://www.avionio.com/fr/airport/ory/departures?ts={timestamp}&page=-2"
+    url = f"https://www.avionio.com/fr/airport/ory/departures?ts={timestamp}&page=-2" #changées par -13 et -7 pour les données du matin et de l'après-midi
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
     vols = []
