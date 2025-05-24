@@ -2,10 +2,19 @@ import pandas as pd
 from datetime import datetime
 import re
 
-# Chargement du CSV
-df = pd.read_csv("vols_orly_details.csv")
-print("Données chargées :")
-print(df.info())
+# Charger les trois fichiers CSV
+df1 = pd.read_csv("vols_orly_details_matin.csv")
+df2 = pd.read_csv("vols_orly_details_aprem.csv")
+df3 = pd.read_csv("vols_orly_details_soir.csv")
+
+# Concaténer les DataFrames
+df_total = pd.concat([df1, df2, df3], ignore_index=True)
+
+# Supprimer les doublons basés sur toutes les colonnes
+df = df_total.drop_duplicates()
+
+# Export vers un nouveau fichier CSV
+df.to_csv("vols_orly_details.csv", index=False, encoding="utf-8")
 
 # Remplacer les terminaux incorrects (A à F) ou manquants par "Inconnu"
 terminaux_valides = ["1", "2", "3", "4"]
