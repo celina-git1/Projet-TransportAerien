@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Prédiction de retard de vol</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f6f4fa; }
+        .container { max-width: 800px; margin-top: 40px; }
+        .card { border-radius: 20px; }
+        .form-control, .btn { border-radius: 8px; }
+        .info-title { font-size: 1.15rem; color: #3666c2; font-weight: bold; }
+        .alert-success { font-size: 1.2rem; }
+        .icon-plane { font-size: 2.1rem; color: #6496f8; margin-right: 10px; vertical-align: -3px;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card p-4">
+        <h1 class="text-center mb-4">
+            <span class="icon-plane">&#9992;</span>
+            Prédiction de retard de vol
+        </h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="compagnie">Compagnie :</label>
+                <select class="form-control" id="compagnie" name="compagnie" required>
+                    <option value="">Sélectionner...</option>
+                    {% for comp in compagnies %}
+                        <option value="{{ comp }}" {% if form_data.compagnie == comp %}selected{% endif %}>{{ comp }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="destination">Destination :</label>
+                <select class="form-control" id="destination" name="destination_liste" required>
+                    <option value="">Sélectionner...</option>
+                    {% for dest in destinations %}
+                        <option value="{{ dest }}" {% if form_data.destination_liste == dest %}selected{% endif %}>{{ dest }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="date_depart">Date de départ :</label>
+                    <input type="date" class="form-control" id="date_depart" name="date_depart" value="{{ form_data.date_depart }}" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="heure_depart">Heure de départ :</label>
+                    <input type="time" class="form-control" id="heure_depart" name="heure_depart" value="{{ form_data.heure_depart }}" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block mt-3">Prédire le retard</button>
+        </form>
+        {% if info_vol %}
+        <div class="mt-4">
+            <div class="info-title">
+                <i class="bi bi-info-circle"></i> Informations du vol
+            </div>
+            <ul>
+                <li><b>Compagnie :</b> {{ info_vol.compagnie }}</li>
+                <li><b>Destination :</b> {{ info_vol.destination_liste }}</li>
+                <li><b>Heure de départ :</b> {{ info_vol.heure_depart_prevue }}</li>
+            </ul>
+        </div>
+        {% endif %}
+        {% if prediction is not none %}
+            <div class="alert alert-success mt-3 text-center">
+                 <b>Retard estimé à l'arrivée :</b> {{ prediction }} minutes
+            </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
